@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>D3 Block-a-Day: Day 19, January 19, 2017</title>
+<style>
+
+#wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+
+.state-boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.8px;
+}
+
+.district-boundary {
+  fill: #000;
+  stroke: #fff;
+  stroke-width: .3px;
+}
+
+.hidden {
+  display: none;
+}
+
+div.tooltip {
+  background-color: #eeeeee;
+  padding: 7px;
+  text-shadow: #f5f5f5 0 1px 0;
+  font: 13px Helvetica Neue;
+  border: 2.5px solid;
+  border-color: black;
+	border-radius: 3px;
+  opacity: 0.95;
+  position: absolute;
+  box-shadow: rgba(0, 0, 0, 0.3) 0 2px 10px;
+}
+</style>
+</head>
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/topojson.v2.min.js"></script>
+
+<div id="wrapper">
+   <div id="chart"></div>
+</div>
+
+<script>
+
+  var width = 960,
+    height = 600;
+  
+  const zoom = d3.zoom()
+      .scaleExtent([1/4, 7])
+      .on('zoom', function () {
+        d3.select('g').attr('transform', d3.event.transform)
+      });
+  
+  var svg = d3.select('#chart')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .call(zoom);
+  
+  var g = svg.append('g').call(zoom);
+  
+  var tooltip = d3.select('#chart').append('div')
+    .attr('class', 'hidden tooltip');
+  
+  var projection = d3.geoAlbersUsa()
+      .scale(1000)
+      .translate([width / 2, height / 2]);
+ 
+  var path = d3.geoPath()
+      .projection(projection);
+
+  d3.json("USA_Districts_States.topojson", function(error, state_districts) {
+  	if (error) throw error;
+
+        g.selectAll(".districts")
+    	  .data(topojson.feature(state_districts, state_districts.objects.districts).features)
+		    .enter()
+		    .append("path")
+    	  .attr("d", path)
+        .attr("class", "district-boundary")
+        .on('mousemove', function (d) {
+          tooltip.classed('hidden', false)
+            .attr('style', 'left:' + (d3.event.clientX + 20) + 'px; top:' + (d3.event.clientY - 20) + 'px')
+            .html(d.properties.name);
+        })
+        .on('mouseout', function () {
+          tooltip.classed('hidden', true);
+        });
+
+    g.selectAll(".states")
+    	  .data(topojson.feature(state_districts, state_districts.objects.states).features)
+		    .enter()
+		    .append("path")
+    	  .attr("d", path)
+        .attr("class", "state-boundary");
+	});
+</script>
+</body>
