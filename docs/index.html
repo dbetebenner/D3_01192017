@@ -29,7 +29,7 @@
 }
 
 div.tooltip {
-  background-color: #eeeeee;
+  background-color: #fff;
   padding: 7px;
   text-shadow: #f5f5f5 0 1px 0;
   font: 13px Helvetica Neue;
@@ -56,7 +56,7 @@ div.tooltip {
     height = 600;
   
   const zoom = d3.zoom()
-      .scaleExtent([1/4, 7])
+      .scaleExtent([1/4, 9])
       .on('zoom', function () {
         d3.select('g').attr('transform', d3.event.transform)
       });
@@ -67,7 +67,7 @@ div.tooltip {
       .attr('height', height)
       .call(zoom);
   
-  var g = svg.append('g').call(zoom);
+  var g = svg.append('g');
   
   var tooltip = d3.select('#chart').append('div')
     .attr('class', 'hidden tooltip');
